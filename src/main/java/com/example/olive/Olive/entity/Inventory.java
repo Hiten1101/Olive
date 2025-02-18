@@ -1,13 +1,19 @@
 package com.example.olive.Olive.entity;
 
-import jakarta.persistence.*;
+import com.example.olive.Olive.Constants.Tables;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "inventory")
+@Table(name = Tables.InventoryTable.NAME)
 @Data
 public class Inventory {
     @Id

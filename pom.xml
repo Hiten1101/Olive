@@ -28,6 +28,8 @@
 	</scm>
 	<properties>
 		<java.version>17</java.version>
+		<checkstyle-maven-plugin.version>3.3.1</checkstyle-maven-plugin.version>
+		<checkstyle-maven-plugin.filePath>.github/linters/sun_checks.xml</checkstyle-maven-plugin.filePath>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -81,6 +83,22 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>${checkstyle-maven-plugin.version}</version>
+				<configuration>
+					<configLocation>${checkstyle-maven-plugin.filePath}</configLocation>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
