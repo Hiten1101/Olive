@@ -1,6 +1,6 @@
 package com.example.olive.Olive.entity;
 
-import com.example.olive.Olive.Constants.Tables;
+import com.example.olive.Olive.constants.Tables;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;

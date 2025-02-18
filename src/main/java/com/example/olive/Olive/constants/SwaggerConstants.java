@@ -1,4 +1,4 @@
-package com.example.olive.Olive.Constants;
+package com.example.olive.Olive.constants;
 
 public class SwaggerConstants {
     /**

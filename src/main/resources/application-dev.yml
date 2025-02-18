@@ -1,0 +1,25 @@
+spring:
+  main:
+    banner-mode: off
+  datasource:
+    url: jdbc:postgresql://postgres-db:5432/olive_dev
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  redis:
+    host: localhost
+    port: 6379
+    password: ""
+    timeout: 60000
+    lettuce:
+      pool:
+        max-active: 10
+        max-idle: 5
+        min-idle: 2

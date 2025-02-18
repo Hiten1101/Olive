@@ -1,8 +1,8 @@
 package com.example.olive.Olive.controller;
 
-import com.example.olive.Olive.Constants.SwaggerConstants;
+import com.example.olive.Olive.constants.SwaggerConstants;
 import com.example.olive.Olive.entity.Inventory;
-import com.example.olive.Olive.repository.InventoryRepository;
+import com.example.olive.Olive.service.InventoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,7 +32,7 @@ import java.util.UUID;
 @Slf4j
 public class InventoryController {
     @Autowired
-    private InventoryRepository inventoryRepository;
+    private InventoryService inventoryService;
 
     /**
      * Create inventory.
@@ -49,16 +48,7 @@ public class InventoryController {
     public ResponseEntity<Inventory> createInventory(
             @RequestBody final Inventory newInventory
     ) {
-        log.info("Creating inventory: {}", newInventory);
-        Inventory inventory = new Inventory();
-        inventory.setName(newInventory.getName());
-        inventory.setDescription(newInventory.getDescription());
-        inventory.setPrice(newInventory.getPrice());
-        inventory.setQuantity(newInventory.getQuantity());
-        inventory.setIsDeleted(false);
-        inventory.setCreatedAt(LocalDateTime.now());
-        inventory.setUpdatedAt(LocalDateTime.now());
-        inventoryRepository.save(inventory);
+        Inventory inventory = inventoryService.addInventory(newInventory);
 
         return new ResponseEntity<>(inventory, HttpStatus.OK);
     }
@@ -79,21 +69,8 @@ public class InventoryController {
             @PathVariable("inventoryId") final UUID inventoryId,
             @RequestBody final Inventory updatedInventory
     ) {
-        log.info("Updating inventory request: {}", updatedInventory);
-        Inventory inventory = inventoryRepository.findById(inventoryId).orElse(null);
-        log.info("Existing inventory: {}", inventory);
-        if (inventory == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        Inventory inventory = inventoryService.editInventory(inventoryId, updatedInventory);
 
-        inventory.setName(updatedInventory.getName());
-        inventory.setDescription(updatedInventory.getDescription());
-        inventory.setPrice(updatedInventory.getPrice());
-        inventory.setQuantity(updatedInventory.getQuantity());
-        inventory.setUpdatedAt(LocalDateTime.now());
-        inventoryRepository.save(inventory);
-
-        log.info("Updated inventory: {}", inventory);
         return new ResponseEntity<>(inventory, HttpStatus.OK);
     }
 
@@ -108,19 +85,12 @@ public class InventoryController {
             description = SwaggerConstants.Inventory.DELETE_DESCRIPTION
     )
     @DeleteMapping("/{inventoryId}")
-    public ResponseEntity<String> deleteInventory(
+    public ResponseEntity<Inventory> deleteInventory(
             @PathVariable("inventoryId") final UUID inventoryId
     ) {
-        Inventory inventory = inventoryRepository.findById(inventoryId).orElse(null);
-        if (inventory == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        Inventory inventory = inventoryService.deleteInventory(inventoryId);
 
-        inventory.setUpdatedAt(LocalDateTime.now());
-        inventory.setIsDeleted(true);
-        inventoryRepository.save(inventory);
-
-        return new ResponseEntity<>("Deleted", HttpStatus.OK);
+        return new ResponseEntity<>(inventory, HttpStatus.OK);
     }
 
     /**
@@ -137,12 +107,8 @@ public class InventoryController {
     public ResponseEntity<String> permanentDeleteInventory(
             @PathVariable("inventoryId") final UUID inventoryId
     ) {
-        Inventory inventory = inventoryRepository.findById(inventoryId).orElse(null);
-        if (inventory == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        inventoryService.permanentDeleteInventory(inventoryId);
 
-        inventoryRepository.delete(inventory);
         return new ResponseEntity<>("Deleted Permanently", HttpStatus.OK);
     }
 
@@ -168,9 +134,7 @@ public class InventoryController {
     public ResponseEntity<List<Inventory>> fetchInventoryList(
             @RequestParam(required = false) final UUID inventoryId
     ) {
-        List<Inventory> inventoryResponseDtoList = inventoryId != null
-                ? inventoryRepository.findById(inventoryId).stream().toList()
-                : inventoryRepository.findAll();
+        List<Inventory> inventoryResponseDtoList = inventoryService.fetchInventoryList(inventoryId);
 
         return new ResponseEntity<>(inventoryResponseDtoList, HttpStatus.OK);
     }
