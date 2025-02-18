@@ -2,6 +2,13 @@ package com.example.olive.Olive.controller;
 
 import com.example.olive.Olive.entity.Inventory;
 import com.example.olive.Olive.repository.InventoryRepository;
+import com.example.olive.Olive.utils.SwaggerConstants;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = SwaggerConstants.INVENTORY_TAG_NAME, description = SwaggerConstants.INVENTORY_TAG_DESCRIPTION)
 @RestController
 @RequestMapping("/api/v3/${spring.application.name}/inventory")
 @Slf4j
@@ -23,6 +31,10 @@ public class InventoryController {
      * Create inventory.
      * @return response entity.
      */
+    @Operation(
+            summary = SwaggerConstants.POST_INVENTORY_SUMMARY,
+            description = SwaggerConstants.POST_INVENTORY_DESCRIPTION
+    )
     @PostMapping
     public ResponseEntity<Inventory> createInventory(
             @RequestBody final Inventory newInventory
@@ -47,6 +59,10 @@ public class InventoryController {
      * @param updatedInventory - updatedInventory to update.
      * @return response entity.
      */
+    @Operation(
+            summary = SwaggerConstants.PUT_INVENTORY_SUMMARY,
+            description = SwaggerConstants.PUT_INVENTORY_DESCRIPTION
+    )
     @PutMapping("/{inventoryId}")
     public ResponseEntity<Inventory> updateInventory(
             @PathVariable("inventoryId") final UUID inventoryId,
@@ -75,6 +91,10 @@ public class InventoryController {
      * @param inventoryId - inventory id to delete.
      * @return response entity.
      */
+    @Operation(
+            summary = SwaggerConstants.DELETE_INVENTORY_SUMMARY,
+            description = SwaggerConstants.DELETE_INVENTORY_DESCRIPTION
+    )
     @DeleteMapping("/{inventoryId}")
     public ResponseEntity<String> deleteInventory(
             @PathVariable("inventoryId") final UUID inventoryId
@@ -91,6 +111,10 @@ public class InventoryController {
         return new ResponseEntity<>("Deleted", HttpStatus.OK);
     }
 
+    @Operation(
+            summary = SwaggerConstants.PERMANENT_DELETE_INVENTORY_SUMMARY,
+            description = SwaggerConstants.PERMANENT_DELETE_INVENTORY_DESCRIPTION
+    )
     @DeleteMapping("/delete/{inventoryId}")
     public ResponseEntity<String> permanentDeleteInventory(
             @PathVariable("inventoryId") final UUID inventoryId
@@ -105,11 +129,24 @@ public class InventoryController {
     }
 
     /**
-     * List inventory.
+     * List all inventory items or inventory item based on id.
+     * @param inventoryId - inventory id to fetch.
      * @return response entity.
      */
+    @Operation(
+            summary = SwaggerConstants.GET_INVENTORY_SUMMARY,
+            description = SwaggerConstants.GET_INVENTORY_DESCRIPTION,
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Successful operation",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Inventory.class)),
+                            headers = @Header(name = "X-Total-Count", description = "Total number of items")
+                    )
+            }
+    )
     @GetMapping
-    public ResponseEntity<List<Inventory>> listInventory(
+    public ResponseEntity<List<Inventory>> fetchInventoryList(
             @RequestParam(required = false) UUID inventoryId
     ) {
         List<Inventory> inventoryResponseDtoList = inventoryId != null
